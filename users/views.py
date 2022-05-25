@@ -4,8 +4,9 @@ from django.contrib import messages
 from django.contrib.auth  import authenticate,  login, logout
 import requests
 import json
+from decouple import config
 
-token = "1000.51e24ebc5cb3dbf2643e850ac9da741e.28cd4bb238732ff36e21779de15cb34f"
+token = config("token")
 # Create your views here.
 def home(request):
     return render(request, 'login.html')
