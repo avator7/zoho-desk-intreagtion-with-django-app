@@ -5,7 +5,7 @@ from django.contrib.auth  import authenticate,  login, logout
 import requests
 import json
 
-
+token = "1000.51e24ebc5cb3dbf2643e850ac9da741e.28cd4bb238732ff36e21779de15cb34f"
 # Create your views here.
 def home(request):
     return render(request, 'login.html')
@@ -87,7 +87,7 @@ def sendTickets(request):
     print(Department,Category,Subject,email,Priority,Descripation)
     
     url = "https://desk.zoho.in/api/v1/tickets"
-    headers = {'orgId':'60014678075','Authorization':'Zoho-oauthtoken 1000.bcf2659490379cb00bc681aed305d554.0203a850513ff536effa30b725b09757'}
+    headers = {'orgId':'60014678075','Authorization':f'Zoho-oauthtoken {token}'}
     payload = {"departmentId" : "75347000000010772","contactId" : "75347000000122029"}
     payload.update({'subject' : Subject})
     payload.update({'description' : Descripation})
@@ -95,7 +95,7 @@ def sendTickets(request):
     payload.update({"priority" : Priority})
 
     print(payload)
-    jsonData =json.dumps(payload)
+    jsonData =json.dumps(payload)     
     response = requests.post(url, headers=headers, data=jsonData)
     print(response.text)
 
@@ -105,7 +105,7 @@ def sendTickets(request):
 
 def GetTickets(request):
     url = "https://desk.zoho.in/api/v1/tickets"
-    headers = {'orgId':'60014678075','Authorization':'Zoho-oauthtoken 1000.bcf2659490379cb00bc681aed305d554.0203a850513ff536effa30b725b09757'}
+    headers = {'orgId':'60014678075','Authorization':f'Zoho-oauthtoken {token}'}
     response = requests.get(url, headers=headers)
     c = json.loads(response.text)
     tickets = c['data']
@@ -113,7 +113,54 @@ def GetTickets(request):
     for i in c['data']:
         print(i['subject'])
     return render(request, 'list.html', {'tickets':tickets})
+
+def DeleteTickets(request, ticket_id):
+    url = "https://desk.zoho.in/api/v1/tickets/moveToTrash"
+    headers = {'orgId':'60014678075','Authorization':f'Zoho-oauthtoken {token}'} 
+    payload = {'ticketIds':[f"{ticket_id}"]}
+    jsonData =json.dumps(payload)   
+    print(ticket_id)
+    print(payload)
+    Response = requests.post(url, headers=headers, data=jsonData)
+    print(Response)
+    return redirect('GetTickets')
+
+def UpdateTickets(request, ticket_id):
+    if request.method == 'POST':
+        Department = request.POST['Department']
+        Category = request.POST['Category']
+        Subject =request.POST['Subject']
+        email =request.POST['email']
+        Descripation = request.POST['descripation']
+        Priority = request.POST['Priority']
+    
+    print(Department,Category,Subject,email,Priority,Descripation)
+
+    print(ticket_id)
+    url = f"https://desk.zoho.in/api/v1/tickets/{ticket_id}"
+    print(ticket_id, url)
+    headers = {'orgId':'60014678075	','Authorization':f'Zoho-oauthtoken {token}'}
+    payload = {'description' : "this is updated!"}
+    payload.update({'subject' : Subject})
+    payload.update({'description' : Descripation})
+    payload.update({"email" : email})
+    payload.update({"priority" : Priority})
+    jsonData =json.dumps(payload)
+    response = requests.patch(url, headers=headers, data=jsonData)
+    print(response.text)
+
+    return redirect('GetTickets')
     
 
-
-
+def update(request, ticket_id):
+    url = "https://desk.zoho.in/api/v1/tickets?include=contacts,assignee,departments,team,isRead"
+    headers = {'orgId':'60014678075','Authorization':f'Zoho-oauthtoken {token}'}
+    response = requests.get(url, headers=headers)
+    c = json.loads(response.text)
+    index = int(ticket_id) - 1
+    tickets = c['data'][index]
+    print(tickets)
+    # print(c['data'])
+    # for i in c['data']:
+    #     print(i['subject'])
+    return render(request, 'update.html', {'tickets':tickets})

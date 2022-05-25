@@ -13,7 +13,7 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar navbar-dark bg-dark">
         <div class="container-fluid mt-2">
-          <a class="navbar-brand" href="/shop">Welcome To Portal</a>
+          <a class="navbar-brand" href="/">Welcome To Portal</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -27,7 +27,7 @@
                 <a class="nav-link active" href="/tickets">Genrate Tickets</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="/GetTickets">My Tickets</a>
+                <a class="nav-link active" href="/GetTickets">Manage Tickets</a>
               </li>
               {% else %}
               {% endif %}
@@ -61,7 +61,7 @@
     </nav>
 
     {% for i in tickets %}
-    <div class="d-flex p-2">{{forloop.counter}} {{i.subject}}</div>
+    <div class="d-flex p-2 mx-1">{{forloop.counter}} <a class="mx-2" href="{% url 'update' forloop.counter %}">{{i.subject}}</a><a class="mx-2" href="{% url 'DeleteTickets' i.id %}">Delete</a></div>
     {% endfor %}
 
 
